@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoo</title>
+</head>
+
+<body>
+    <!-- Animal Input Fields -->
+    Name: <input type="text" id="Name" required> <br>
+    <br>
+    Type: <input type="text" id="type" required> <br>
+    <br>
+    Age: <input type="number" id="age" required> <br>
+    <br>
+    Photo: <input type="file" id="photo" accept="image/*"> <br>
+    <br>
+    <button onclick="addAnimal()">Add</button>
+    <hr>
+
+    <!-- Display List of Animals -->
+    <div id="display"></div>
+
+    <script>
+        let animals = []; // Array to store animal data
+
+        // Add a new animal with all data including photo
+        function addAnimal() {
+            const nameInput = document.getElementById("Name").value.trim();
+            const typeInput = document.getElementById("type").value.trim();
+            const ageInput = document.getElementById("age").value.trim();
+            const fileInput = document.getElementById("photo");
+            const file = fileInput.files[0];
+
+            // Validate all fields
+            if (!nameInput || !typeInput || !ageInput || !file) {
+                alert("Please fill in all fields and select a photo before adding an animal.");
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const animal = {
+                    Name: nameInput,
+                    Type: typeInput,
+                    Age: ageInput,
+                    Photo: e.target.result // Save the photo as a base64 Data URL
+                };
+
+                animals.push(animal);
+                console.table(animals);
+                displayAnimals();
+            };
+
+            reader.readAsDataURL(file); // Read the photo as a Data URL
+        }
+
+        // Display the saved animals with their data
+        function displayAnimals() {
+            const display = document.getElementById("display");
+            display.innerHTML = "";
+
+            for (let i = 0; i < animals.length; i++) {
+                display.innerHTML += `
+                    <div>
+                        Name: ${animals[i].Name}<br>
+                        Type: ${animals[i].Type}<br>
+                        Age: ${animals[i].Age}<br>
+                        <img src="${animals[i].Photo}" alt="Animal Photo" style="max-width: 100px; max-height: 100px;"><br>
+                        <button onclick="del(${i})">Delete</button>
+                    </div>
+                    <hr>
+                `;
+            }
+        }
+
+        // Delete an animal
+        function del(ind) {
+            console.log(`Deleting animal: index ${ind}`);
+            animals.splice(ind, 1);
+            console.table(animals);
+            displayAnimals();
+        }
+
+        // Save data to localStorage
+        function save() {
+            console.log("Saving...");
+            localStorage.setItem("animals", JSON.stringify(animals));
+        }
+    </script>
+
+    <!-- Save Button -->
+    <button onclick="save()" style="position: absolute; bottom: 0%; right: 0%; margin: 10px;">Save</button>
+</body>
+
+</html>
